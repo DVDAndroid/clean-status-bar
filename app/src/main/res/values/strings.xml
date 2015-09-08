@@ -44,5 +44,6 @@
     <string name="button_cancel">@string/cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="xposed_integration">Tint status bar as color of your status bar app</string>
 
 </resources>

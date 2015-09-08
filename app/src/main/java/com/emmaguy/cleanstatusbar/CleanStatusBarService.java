@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
@@ -37,6 +38,10 @@ public class CleanStatusBarService extends Service {
     public CleanStatusBarService() {
     }
 
+    public static boolean isRunning() {
+        return sIsRunning;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -51,26 +56,33 @@ public class CleanStatusBarService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         final int apiValue = mPreferences.getApiValue();
+        int color = mPreferences.getBackgroundColour();
+        try {
+            color = intent.getIntExtra("color",
+                    Color.BLACK);
+        } catch (NullPointerException ignored) {
+        }
         if (apiValue == VERSION_CODE_M) {
-            mStatusBarConfig = new MStatusBarConfig(getResources(), getAssets(), mPreferences.isLightModeEnabled());
+            mStatusBarConfig = new MStatusBarConfig(getResources(), getAssets(),
+                    mPreferences.isLightModeEnabled());
         } else if (apiValue == Build.VERSION_CODES.LOLLIPOP) {
-            mStatusBarConfig = new LollipopStatusBarConfig(getResources(), getAssets());
+            mStatusBarConfig = new LollipopStatusBarConfig(getResources(),
+                    getAssets());
         } else if (apiValue == Build.VERSION_CODES.KITKAT) {
-            mStatusBarConfig = new KitKatStatusBarConfig(getResources(), getAssets(), mPreferences.isKitKatGradientEnabled());
+            mStatusBarConfig = new KitKatStatusBarConfig(getResources(),
+                    getAssets(), mPreferences.isKitKatGradientEnabled());
         } else {
-            mStatusBarConfig = new DefaultStatusBarConfig(getResources(), getAssets());
+            mStatusBarConfig = new DefaultStatusBarConfig(getResources(),
+                    getAssets());
         }
 
         if (sStatusBarView == null) {
             sStatusBarView = new StatusBarView(this);
             mWindowManager.addView(sStatusBarView, getWindowManagerParams());
         }
-        sStatusBarView.setStatusBarConfig(mStatusBarConfig,
-                mPreferences.getBackgroundColour(),
-                mPreferences.getClockTime(),
-                mPreferences.showWifiIcon(),
-                mPreferences.show3gIcon(),
-                mPreferences.showGpsIcon());
+        sStatusBarView.setStatusBarConfig(mStatusBarConfig, color,
+                mPreferences.getClockTime(), mPreferences.showWifiIcon(),
+                mPreferences.show3gIcon(), mPreferences.showGpsIcon());
 
         showNotification();
 
@@ -123,9 +135,5 @@ public class CleanStatusBarService extends Service {
 
     private void removeNotification() {
         mNotificationManager.cancel(NOTIFICATION_ID);
-    }
-
-    public static boolean isRunning() {
-        return sIsRunning;
     }
 }

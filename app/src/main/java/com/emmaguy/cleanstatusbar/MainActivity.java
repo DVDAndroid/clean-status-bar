@@ -17,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import com.emmaguy.cleanstatusbar.prefs.TimePreference;
+import com.emmaguy.cleanstatusbar.xposed.Receiver;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent service = new Intent(MainActivity.this, CleanStatusBarService.class);
                 if (b) {
                     startService(service);
+                    new Receiver();
                 } else {
                     stopService(service);
                 }
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         final ActionBar.LayoutParams lp = new ActionBar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
         lp.rightMargin = getResources().getDimensionPixelSize(R.dimen.master_switch_margin_right);
+        assert bar != null;
         bar.setCustomView(masterSwitch, lp);
         bar.setDisplayShowCustomEnabled(true);
     }
@@ -66,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
             updateEnableKitKatGradientOption();
             updateEnableMLightModeOption();
             updateTimePreference();
+
+            if (Build.VERSION.SDK_INT < 21) {
+                findPreference("xposed_integration").setEnabled(false);
+            }
+
         }
 
         @Override
