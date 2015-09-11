@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (Build.VERSION.SDK_INT < 21) {
                 findPreference("xposed_integration").setEnabled(false);
+                findPreference(getString(R.string.key_background_colour)).setEnabled(true);
             }
 
         }
